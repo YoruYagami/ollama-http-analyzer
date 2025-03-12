@@ -10,8 +10,6 @@ package ai;
 
 import burp.api.montoya.ai.Ai;
 import burp.api.montoya.ai.chat.Message;
-import burp.api.montoya.ai.chat.PromptException;
-import burp.api.montoya.ai.chat.PromptResponse;
 import burp.api.montoya.logging.Logging;
 
 import static burp.api.montoya.ai.chat.Message.systemMessage;
@@ -41,14 +39,32 @@ public class PromptHandler
         {
             try
             {
-                return ai.prompt().execute(build(userPrompt));
+                burp.api.montoya.ai.chat.PromptResponse response = ai.prompt().execute(build(userPrompt));
+                return new PromptResponseAdapter(response);
             }
-            catch (PromptException e)
+            catch (Exception e)
             {
                 logging.logToError(e);
+                throw new RuntimeException("Error executing prompt: " + e.getMessage(), e);
             }
         }
 
         throw new RuntimeException("Please enable AI functionality.");
+    }
+    
+    /**
+     * Adapter class to convert Burp's PromptResponse to our custom PromptResponse
+     */
+    private static class PromptResponseAdapter implements PromptResponse {
+        private final burp.api.montoya.ai.chat.PromptResponse burpResponse;
+        
+        public PromptResponseAdapter(burp.api.montoya.ai.chat.PromptResponse burpResponse) {
+            this.burpResponse = burpResponse;
+        }
+        
+        @Override
+        public String content() {
+            return burpResponse.content();
+        }
     }
 }

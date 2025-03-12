@@ -1,6 +1,5 @@
 package ai;
 
-import burp.api.montoya.ai.chat.PromptResponse;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
@@ -22,12 +21,12 @@ public class BurpAiRequestTab extends JPanel
 {
     private final Logging logging;
     private final ExecutorService executorService;
-    private final PromptHandler promptHandler;
+    private final BurpAITab.AIProvider aiProvider;
 
-    public BurpAiRequestTab(Logging logging, UserInterface userInterface, ExecutorService executorService, PromptHandler promptHandler, HttpRequestResponse requestResponse) {
+    public BurpAiRequestTab(Logging logging, UserInterface userInterface, ExecutorService executorService, BurpAITab.AIProvider aiProvider, HttpRequestResponse requestResponse) {
         this.logging = logging;
         this.executorService = executorService;
-        this.promptHandler = promptHandler;
+        this.aiProvider = aiProvider;
 
         this.setLayout(new BorderLayout());
 
@@ -139,7 +138,7 @@ public class BurpAiRequestTab extends JPanel
         // Execute the AI prompt in a separate thread
         executorService.execute(() -> {
             try {
-                PromptResponse aiResponse = promptHandler.sendWithSystemMessage(promptText);
+                PromptResponse aiResponse = aiProvider.sendWithSystemMessage(promptText);
 
                 String content = aiResponse.content();
 

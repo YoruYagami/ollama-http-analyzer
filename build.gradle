@@ -5,6 +5,11 @@ plugins {
 group 'net.portswigger.burp.extensions.example'
 version '2025.1.1' // fixed version number
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 repositories {
     mavenCentral()
 }
@@ -13,6 +18,7 @@ dependencies {
     compileOnly 'net.portswigger.burp.extensions:montoya-api:2025.2' // Burp API
     implementation 'org.commonmark:commonmark:0.18.2' // Markdown rendering
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+    implementation 'org.json:json:20231013' // JSON library for Ollama API
 }
 
 jar {

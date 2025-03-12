@@ -17,14 +17,14 @@ public class BurpAITab {
     private final Map<Component, HttpRequestResponse> tabRequests;
     private int tabCounter = 1;
     private final Logging logging;
-    private final PromptHandler promptHandler;
+    private final AIProvider aiProvider;
     private final ExecutorService executorService;
     private final UserInterface userInterface;
 
-    public BurpAITab(UserInterface userInterface, Logging logging, PromptHandler promptHandler, ExecutorService executorService) {
+    public BurpAITab(UserInterface userInterface, Logging logging, AIProvider aiProvider, ExecutorService executorService) {
         this.userInterface = userInterface;
         this.logging = logging;
-        this.promptHandler = promptHandler;
+        this.aiProvider = aiProvider;
         this.executorService = executorService;
 
         tabRequests = new HashMap<>();
@@ -58,7 +58,7 @@ public class BurpAITab {
     }
 
     private Component createTabContent(HttpRequestResponse requestResponse) {
-        return new BurpAiRequestTab(logging, userInterface, executorService, promptHandler, requestResponse);
+        return new BurpAiRequestTab(logging, userInterface, executorService, aiProvider, requestResponse);
     }
 
     private Component createTabComponent(String title) {
@@ -153,36 +153,17 @@ public class BurpAITab {
     public Component getUiComponent() {
         return mainPanel;
     }
-
-//    This is unused:
-//    private void updateTabContent(Component tabContent, HttpRequestResponse requestResponse) {
-//        if (requestResponse == null) {
-//            logging.logToError("Request/Response is null");
-//            return;
-//        }
-//
-//        logging.logToOutput("Updating tab content with request: " + requestResponse.request().toString());
-//
-//        if (tabContent instanceof JPanel) {
-//            JSplitPane verticalSplit = (JSplitPane) ((JPanel) tabContent).getComponent(0);
-//            JSplitPane horizontalSplit = (JSplitPane) verticalSplit.getTopComponent();
-//
-//            Component leftComponent = horizontalSplit.getLeftComponent();
-//            Component rightComponent = horizontalSplit.getRightComponent();
-//
-//            if (leftComponent instanceof Component) {
-//                HttpRequestEditor reqEditor = (HttpRequestEditor) SwingUtilities.getAncestorOfClass(HttpRequestEditor.class, leftComponent);
-//                if (reqEditor != null) {
-//                    reqEditor.setRequest(requestResponse.request());
-//                }
-//            }
-//
-//            if (rightComponent instanceof Component) {
-//                HttpResponseEditor respEditor = (HttpResponseEditor) SwingUtilities.getAncestorOfClass(HttpResponseEditor.class, rightComponent);
-//                if (respEditor != null) {
-//                    respEditor.setResponse(requestResponse.response());
-//                }
-//            }
-//        }
-//    }
+    
+    /**
+     * Interface for an AI provider that can send prompts.
+     */
+    public interface AIProvider {
+        /**
+         * Sends a prompt to the AI provider.
+         *
+         * @param userPrompt The user prompt
+         * @return The response from the AI provider
+         */
+        PromptResponse sendWithSystemMessage(String userPrompt);
+    }
 }
